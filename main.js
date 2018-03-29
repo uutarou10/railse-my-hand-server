@@ -80,13 +80,14 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Disconnected...')
-    users = users.filter((user) => {
-      return currentUser.uuid !== user.uuid
-    })
-
-    emitUpdatedUserCount();
 
     if (currentUser && !currentUser.isAdmin) {
+      users = users.filter((user) => {
+        return currentUser.uuid !== user.uuid
+      })
+
+      emitUpdatedUserCount();
+      
       jobQueue = jobQueue.filter((job) => {
         return currentUser.uuid !== job.user.uuid
       })
@@ -102,6 +103,7 @@ io.on('connection', (socket) => {
 
   /* emit to all clients when update count of users. */
   const emitUpdatedUserCount = () => {
+    console.log(users)
     const userCount = users.filter((user) => (!user.isAdmin)).length
     socket.broadcast.emit('updateUserCount', userCount)
   }
