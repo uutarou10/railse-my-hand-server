@@ -83,6 +83,7 @@ io.on('connection', (socket) => {
         jobQueue = jobQueue.filter((job) => {
           return job.user.uuid !== currentUser.uuid 
         })
+        socket.emit('canceled')
     }
     emitUpdatedJobQueue()
   })
