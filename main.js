@@ -18,7 +18,7 @@ server.listen(PORT)
 io.on('connection', (socket) => {
   console.log('New connection established.')
   let currentUser = null 
-  let isOpen = false;
+  let isOpen = true;
 
   /* initialize */
   socket.emit('currentJobQueue', jobQueue)
@@ -49,8 +49,7 @@ io.on('connection', (socket) => {
 
   /* task confirmation event */
   socket.on('taskConfirmation', () => {
-    if (!isOpen ||currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
-
+    if (!isOpen || currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
     jobQueue.push(createJob(currentUser, 'taskConfirmation'))
     emitUpdatedJobQueue()
   })
@@ -108,18 +107,19 @@ io.on('connection', (socket) => {
 
   /* emit to all clients when update job queue. */
   const emitUpdatedJobQueue = () => {
-    socket.broadcast.emit('updateJobQueue', jobQueue)
+    console.log(jobQueue)
+    io.sockets.emit('updateJobQueue', jobQueue)
   }
 
   /* emit to all clients when update count of users. */
   const emitUpdatedUserCount = () => {
     console.log(users)
     const userCount = users.filter((user) => (!user.isAdmin)).length
-    socket.broadcast.emit('updateUserCount', userCount)
+    io.sockets.emit('updateUserCount', userCount)
   }
 
   const emitUpdatedStatus = () => {
-    socket.broadcast.emit('updateStatus', isOpen)
+    io.sockets.emit('updateStatus', isOpen)
   }
 })
 
