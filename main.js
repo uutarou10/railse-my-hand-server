@@ -18,9 +18,11 @@ server.listen(PORT)
 io.on('connection', (socket) => {
   console.log('New connection established.')
   let currentUser = null 
+  let isOpen = false;
 
   /* initialize */
   socket.emit('currentJobQueue', jobQueue)
+  socket.emit('currentStatus', isOpen)
 
   /* for debugging */
   socket.on('debug', (payload) => {
@@ -59,6 +61,13 @@ io.on('connection', (socket) => {
 
     jobQueue.push(createJob(currentUser, 'question'))
     emitUpdatedJobQueue()
+  })
+
+  socket.on('toggleStatus', () => {
+    if (currentUser && currentUser.isAdmin) {
+      isOpen = !isOpen
+      emitUpdatedStatus()
+    }
   })
 
   /* cancel enqueued job */
@@ -106,6 +115,10 @@ io.on('connection', (socket) => {
     console.log(users)
     const userCount = users.filter((user) => (!user.isAdmin)).length
     socket.broadcast.emit('updateUserCount', userCount)
+  }
+
+  const emitUpdatedStatus = () => {
+    socket.broadcast.emit('updateStatus', isOpen)
   }
 })
 
