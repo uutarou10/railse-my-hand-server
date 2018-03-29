@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
 
   /* task confirmation event */
   socket.on('taskConfirmation', () => {
-    if (currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
+    if (!isOpen ||currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
 
     jobQueue.push(createJob(currentUser, 'taskConfirmation'))
     emitUpdatedJobQueue()
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
 
   /* question event */
   socket.on('question', () => {
-    if (currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
+    if (!isOpen || currentUser.isAdmin || isAlreadyEnqueued(currentUser)) return
 
     jobQueue.push(createJob(currentUser, 'question'))
     emitUpdatedJobQueue()
